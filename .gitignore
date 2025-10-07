@@ -1,0 +1,16 @@
+.venv
+
+*.mp4
+*.pyc
+output
+test.py
+downloads
+build/
+dist
+links.txt
+ext/adblocker.crx
+
+ext
+test.py
+.script
+sources
