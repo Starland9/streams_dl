@@ -9,6 +9,7 @@ from models.uqvideo import UqVideo
 from uqload_dl import UQLoad
 
 from providers.provider import AbstractProvider
+from cache import cache_video_links
 
 
 class FrenchStreamProvider(AbstractProvider):
@@ -35,6 +36,7 @@ class FrenchStreamProvider(AbstractProvider):
 
         return [Media.from_web_element(sf) for sf in all_results]
 
+    @cache_video_links
     async def get_uqvideos_from_media_url(self, url: str) -> list[UqVideo]:
         """
         Gets all UqVideo objects from a media page URL.

@@ -17,6 +17,7 @@ from uqload_dl import UQLoad
 from models.media import Media
 from models.uqvideo import UqVideo
 from providers.provider import AbstractProvider
+from cache import cache_video_links
 
 
 class PapaduStreamProvider(AbstractProvider):
@@ -369,6 +370,7 @@ class PapaduStreamProvider(AbstractProvider):
 
         return cleaned
 
+    @cache_video_links
     async def get_uqvideos_from_media_url(self, url: str) -> List[UqVideo]:
         uqvideos: List[UqVideo] = []
         seen_links: Set[str] = set()
