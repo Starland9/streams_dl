@@ -1,5 +1,8 @@
 .venv
 
+# Service systemd (use .example as template)
+deploy/systemd/streams_dl.service
+
 *.mp4
 *.pyc
 output
