@@ -40,7 +40,7 @@ providers = {
 }
 
 # Default provider
-default_provider = "flemmix"
+default_provider = "french-stream"
 
 
 # --- FastAPI App ---
