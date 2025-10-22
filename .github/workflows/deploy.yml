@@ -1,0 +1,59 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+    types: [closed]
+
+jobs:
+  deploy:
+    # Déployer seulement si le push est sur main OU si la PR est merged
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
+    
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 🚀 Déploiement sur VPS
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USERNAME }}
+        key: ${{ secrets.VPS_SSH_KEY }}
+        port: ${{ secrets.VPS_PORT }}
+        script: |
+          echo "📦 Début du déploiement..."
+          
+          # Se déplacer dans le répertoire du projet
+          cd "${{ secrets.VPS_PROJECT_PATH }}" || exit 1
+          
+          # Sauvegarder les fichiers locaux sensibles
+          echo "💾 Sauvegarde des fichiers locaux..."
+          if [ -f "deploy/systemd/streams_dl.service" ]; then
+            cp deploy/systemd/streams_dl.service deploy/systemd/streams_dl.service.backup
+          fi
+          
+          # Récupérer les dernières modifications
+          echo "🔄 Mise à jour du code..."
+          git fetch origin
+          git reset --hard origin/main
+          
+          # Restaurer le fichier service local
+          if [ -f "deploy/systemd/streams_dl.service.backup" ]; then
+            mv deploy/systemd/streams_dl.service.backup deploy/systemd/streams_dl.service
+          fi
+          
+          # Activer l'environnement virtuel et mettre à jour les dépendances
+          echo "📚 Installation des dépendances..."
+          source .venv/bin/activate
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          
+          # Lancer le script de déploiement
+          echo "🚀 Exécution du script de déploiement..."
+          ./deploy/deploy.sh
+          
+          echo "🎉 Déploiement terminé avec succès!"
