@@ -17,16 +17,16 @@ log() {
     echo "[$(date +'%Y-%m-%d %H:%M:%S')] $1" | tee -a "$LOG_FILE"
 }
 
+# Vérifier que le script est exécuté en tant que root, sinon le relancer avec sudo
+if [[ $EUID -ne 0 ]]; then
+   echo "Relancement du script avec les droits sudo..."
+   exec sudo "$0" "$@"
+fi
+
 log "=== Démarrage du déploiement du service streams_dl ==="
 log "Script: $0"
 log "Service: $SERVICE_FILE"
 log "Destination: $SYSTEMD_DIR/$SERVICE_NAME"
-
-# Vérifier que le script est exécuté en tant que root
-if [[ $EUID -ne 0 ]]; then
-   log "❌ Ce script doit être exécuté en tant que root (utiliser sudo)"
-   exit 1
-fi
 
 # Vérifier que le fichier service existe
 if [[ ! -f "$SERVICE_FILE" ]]; then
