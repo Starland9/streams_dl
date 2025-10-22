@@ -3,14 +3,11 @@ import uvicorn
 from fastapi import FastAPI, Body, BackgroundTasks
 from fastapi.concurrency import run_in_threadpool
 from selenium import webdriver
-import urllib.parse
 from uqload_dl import UQLoad
 import os
 from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
 
-from models.media import Media
-from models.uqvideo import UqVideo
 from providers.french_stream import FrenchStreamProvider
 from providers.papadustream import PapaduStreamProvider
 from providers.flemmix import FlemmixProvider
@@ -21,7 +18,7 @@ DOWNLOADS_DIR = os.path.join(os.getcwd(), "downloads")
 
 # --- Selenium WebDriver Setup ---
 chrome_options = webdriver.ChromeOptions()
-# chrome_options.add_argument("--headless")
+chrome_options.add_argument("--headless")
 chrome_options.add_argument("--no-sandbox")
 chrome_options.add_argument("--disable-dev-shm-usage")
 chrome_options.add_argument("--disable-gpu")
@@ -79,6 +76,7 @@ async def list_providers():
         "default": default_provider
     }
 
+
 @app.get("/search", summary="Search for media")
 async def search(query: str, provider_name: str = default_provider):
     """
@@ -91,7 +89,7 @@ async def search(query: str, provider_name: str = default_provider):
         return {
             "error": f"Invalid provider. Available providers: {', '.join(providers.keys())}"
         }
-    
+
     provider = providers[provider_name]
     search_results = await run_in_threadpool(provider.search_media, query)
     return {"results": [media.to_dict() for media in search_results]}
@@ -99,8 +97,10 @@ async def search(query: str, provider_name: str = default_provider):
 
 @app.post("/get-videos", summary="Get video links from a media URL")
 async def get_videos(
-    media_url: str = Body(..., embed=True, description="The URL of the media page from a search result."),
-    provider_name: str = Body(default_provider, embed=True, description="The provider name (papadustream, french-stream, or flemmix).")
+    media_url: str = Body(..., embed=True,
+                          description="The URL of the media page from a search result."),
+    provider_name: str = Body(default_provider, embed=True,
+                              description="The provider name (papadustream, french-stream, or flemmix).")
 ):
     """
     Takes a media page URL and scrapes it to find direct UQload video links.
@@ -109,7 +109,7 @@ async def get_videos(
         return {
             "error": f"Invalid provider. Available providers: {', '.join(providers.keys())}"
         }
-    
+
     provider = providers[provider_name]
     video_results = await provider.get_uqvideos_from_media_url(media_url)
     return {"results": [video.to_dict() for video in video_results]}
@@ -124,8 +124,8 @@ async def download(background_tasks: BackgroundTasks, video_url: str = Body(...,
     background_tasks.add_task(download_video_in_background, video_url)
     return {"message": "Download started in background.", "video_url": video_url}
 
-# --- Lifecycle Events ---
 
+# --- Lifecycle Events ---
 
 @app.on_event("startup")
 def startup_event():
