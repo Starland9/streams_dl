@@ -86,8 +86,11 @@ Ajoutez cette ligne à la fin :
 
 ```
 landry ALL=(ALL) NOPASSWD: /bin/systemctl restart streams_dl
+landry ALL=(ALL) NOPASSWD: /usr/bin/systemctl restart streams_dl
 landry ALL=(ALL) NOPASSWD: /bin/systemctl status streams_dl
+landry ALL=(ALL) NOPASSWD: /usr/bin/systemctl status streams_dl
 landry ALL=(ALL) NOPASSWD: /bin/journalctl
+landry ALL=(ALL) NOPASSWD: /usr/bin/journalctl
 ```
 
 ## Test du Déploiement

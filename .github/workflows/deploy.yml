@@ -39,7 +39,11 @@ jobs:
           # Récupérer les dernières modifications
           echo "🔄 Mise à jour du code..."
           git fetch origin
+          # Sauvegarder les modifications locales non commitées
+          git stash
           git reset --hard origin/main
+          # Restaurer les modifications locales si besoin
+          git stash pop || true
           
           # Restaurer le fichier service local
           if [ -f "deploy/systemd/streams_dl.service.backup" ]; then
@@ -48,11 +52,16 @@ jobs:
           
           # Activer l'environnement virtuel et mettre à jour les dépendances
           echo "📚 Installation des dépendances..."
-          source .venv/bin/activate
-          pip install --upgrade pip
-          pip install -r requirements.txt
-          
           # Lancer le script de déploiement
+          echo "🚀 Exécution du script de déploiement..."
+          if [ -x deploy/deploy.sh ]; then
+            ./deploy/deploy.sh
+          else
+            echo "Deploy script not found or not executable"
+            exit 1
+          fi
+          
+          echo "🎉 Déploiement terminé avec succès!"
           echo "🚀 Exécution du script de déploiement..."
           ./deploy/deploy.sh
           
