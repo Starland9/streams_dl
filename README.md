@@ -222,6 +222,8 @@ The project follows these patterns:
 - All providers normalize UQload URLs to ensure uniqueness
 - The API uses a single shared Chrome driver instance for efficiency
 - Downloads are handled in background tasks
+- **Video link retrieval is cached** to improve performance - see [CACHE.md](CACHE.md) for details
+- Search operations are **not cached** to ensure fresh results
 
 ## Legal Notice
 
